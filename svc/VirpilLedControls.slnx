@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="VirpilLedControls.Tests/VirpilLedControls.Tests.csproj" />
+  <Project Path="VirpilLedControls/VirpilLedControls.csproj" />
+</Solution>
