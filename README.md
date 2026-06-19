@@ -15,7 +15,7 @@ As a result it allows dynamic lighting control integrated directly into your SPA
 1. **Place in SPAD.neXt Addons directory**: Unpack the DLL files into the SPAD.neXt Addons directory, normally located in %userprofile%\Documents\SPAD.neXt\Addons. Create the Addons directory if it does not exist. SPAD.neXt will automatically load the assembly on startup and initialize the script. See the official documentation at https://docs.spadnext.com/extending-and-apis/scripting-interface/c-scripting-precompile for information.
 2. **Configure SPAD.neXt**: When creating a new rule or state change, you can trigger the script by specifying "External Script" as an action and picking "VirpilLightAutomationScript" from the dropdown. Paste the Json snippet defined in the Usage section below into the provided argument text box.
 
-![Select Script dialog](https://github.com/runeapetersen/VirpilLedControls/blob/main/img.png?raw=true)
+![Select Script dialog](https://github.com/runeapetersen/VirpilLedControls/blob/main/select_script.png?raw=true)
 
 ## Usage
 1.  **Get Device IDs**: Open the VPC Configuration Tool, go to your device view, and note the Vendor ID (VID) and Product ID (PID). Use these values exactly as displayed (check if they are hex or decimal).
