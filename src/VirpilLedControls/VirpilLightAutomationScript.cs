@@ -12,10 +12,11 @@ using SPAD.neXt.Interfaces.Scripting.Stubs;
 namespace VirpilLedControls
 {
     [UsedImplicitly]
-    public class VirpilLightAutomationScript : ScriptStub, IScriptAction2
+    public class VirpilLightAutomationScript : ScriptStub, IScriptAction2, IHasID
     {
         private List<VirpilDevice> _virpilDevices = new List<VirpilDevice>();
-
+        public Guid ID => Guid.Parse("5af37a59-2137-487a-8b1d-94a206d71d89");
+        
         protected override void InitializeScript()
         {
             var devs = HidDevices.Enumerate(VirpilDevice.VendorId);
@@ -38,7 +39,7 @@ namespace VirpilLedControls
             // do nothing
         }
 
-        protected override string ScriptDataPrefix { get; }
+        protected override string ScriptDataPrefix => nameof(VirpilLightAutomationScript);
 
         public void Execute(IApplication app, ISPADEventArgs eventArgs)
         {
