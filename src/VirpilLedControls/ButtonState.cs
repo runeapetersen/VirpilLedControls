@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using HidLibrary;
+using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Logging;
 
 namespace VirpilLedControls
@@ -14,17 +14,19 @@ namespace VirpilLedControls
         private CancellationTokenSource _cts;
         private Task<int> _task;
         private readonly ILogger _logger;
-        private readonly object _lockObject = new object();
+        private readonly ISmartLock _lockObject;
         
         public ButtonState(int configButton, ILogger logger)
         {
             _configButton = configButton;
             _logger = logger.CreateChildLogger(nameof(ButtonState));
+            _lockObject = SpadSystem.ApplicationProxy.CreateLock(nameof(ButtonState) + _configButton);
         }
 
-        public void SetColors(HidDevice device, IEnumerable<ButtonColor> configColors, int? configIntervalMs)
+        public void SetColors(Action<byte[]> deviceWriter, IEnumerable<ButtonColor> configColors, int? configIntervalMs)
         {
-            lock (_lockObject)
+            // NEVER use lock {} as this can deadlock complete SPAD. Always use the buildin SmartLock which will automatically timeout and abort 
+            _lockObject.Lock(() =>
             {
                 _cts?.Cancel();
                 try
@@ -42,21 +44,21 @@ namespace VirpilLedControls
 
                 if (colorCount > 1)
                     _task = Task.Factory.StartNew(
-                        () => ChangeColors(device, configColors, configIntervalMs.GetValueOrDefault(), token), token);
+                        () => ChangeColors(deviceWriter, configColors, configIntervalMs.GetValueOrDefault(), token), token);
                 else
                 {
-                    _task = Task.Factory.StartNew(() => SolidColor(device, configColors.First(), token), token);
+                    _task = Task.Factory.StartNew(() => SolidColor(deviceWriter, configColors.First(), token), token);
                 }
-            }
+            });
         }
 
-        private int SolidColor(HidDevice device, ButtonColor first, CancellationToken _)
+        private int SolidColor(Action<byte[]> deviceWriter, ButtonColor first, CancellationToken _)
         {
             _logger.Info("Setting solid color for button {Button}", _configButton);
             var packet = PacketHandling.CreatePacket(PacketHandling.BoardType.OnBoard, _configButton, first.R, first.G, first.B);
             try
             {
-                device.WriteFeatureData(packet);
+                deviceWriter(packet);
             }
             catch (Exception e)
             {
@@ -65,7 +67,7 @@ namespace VirpilLedControls
             return 0;
         }
 
-        private int ChangeColors(HidDevice device, IEnumerable<ButtonColor> configColors, int configIntervalMs,
+        private int ChangeColors(Action<byte[]> deviceWriter, IEnumerable<ButtonColor> configColors, int configIntervalMs,
             CancellationToken token)
         {
             var colors = configColors.ToArray();
@@ -76,7 +78,7 @@ namespace VirpilLedControls
                 var packet = PacketHandling.CreatePacket(PacketHandling.BoardType.OnBoard, _configButton, colors[i].R, colors[i].G, colors[i].B);
                 try
                 {
-                    device.WriteFeatureData(packet);
+                    deviceWriter(packet);
                 }
                 catch (Exception e)
                 {
