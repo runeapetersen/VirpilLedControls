@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using HidLibrary;
-using JetBrains.Annotations;
-using Newtonsoft.Json;
+using System.Text.Json;
 using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Events;
 using SPAD.neXt.Interfaces.Scripting;
 using SPAD.neXt.Interfaces.Scripting.Stubs;
+// ReSharper disable UnusedType.Global
 
 namespace VirpilLedControls
 {
-    [UsedImplicitly]
     public class VirpilLightAutomationScript : ScriptStub, IScriptAction2, IHasID
     {
         private List<VirpilDevice> _virpilDevices = new List<VirpilDevice>();
@@ -57,7 +56,7 @@ namespace VirpilLedControls
 
             ScriptLogger.Info("Received config payload of length {Length}", rawConfigJson.Length);
             
-            var config = JsonConvert.DeserializeObject<Config>(rawConfigJson);
+            var config = JsonSerializer.Deserialize<Config>(rawConfigJson);
             if (config == null)
             {
                 throw new ArgumentException("Invalid argument. Unable to deserialize JSON configuration.");

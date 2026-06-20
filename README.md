@@ -22,7 +22,7 @@ As a result it allows dynamic lighting control integrated directly into your SPA
 2.  **Identify the Button**: Find the button number corresponding to your target LED in the VPC tool's monitoring tab.
 3.  **Build Your Configuration**: Create a single-line JSON object using the template below:
 ```
-{"Vid":3344,"Pid":4259,"Button":3,"Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
+{"Vid":"3344","Pid":"4259","Button":3,"Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
 ```
 Note: Although formatted on one line, the structure is: DeviceID→Button→ColorArray→Interval. Copy-paste exactly as shown.
 
@@ -35,6 +35,7 @@ Note: Although formatted on one line, the structure is: DeviceID→Button→Colo
 | `Button` | Target button/LED number | ✅ Yes |
 | `Colors` | Array of RGB states (`"Off"`, `"Thirty"`, `"Sixty"`, `"Full"`) | ✅ Yes |
 | `IntervalMs` | Milliseconds between color changes when cycling | ❌ Optional (required if using >1 color) |
+**Technical note**: The `Vid` and `Pid` fields are provided as strings, not integers. The script expects these values to be in hexadecimal as reported by the VPC tool so the user can enter the values as reported without having to convert them first.
 
 4.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
 5.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
