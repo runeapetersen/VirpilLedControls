@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using HidLibrary;
 using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Events;
 using SPAD.neXt.Interfaces.Scripting;
 using SPAD.neXt.Interfaces.Scripting.Stubs;
-using SPAD.neXt.Interfaces.Configuration;
+
 // ReSharper disable UnusedType.Global
 
 namespace VirpilLedControls
@@ -30,7 +31,6 @@ namespace VirpilLedControls
         public void Execute(IApplication app, ISPADEventArgs eventArgs)
         {
             // No need to throw. Interface IScriptaction2 ensures this is not called at all.
-            // throw new NotSupportedException("Unsupported operation. Use IScriptAction2.Execute");
         }
 
         public void Execute(IApplication app, List<IEventActionParameter> actionParameters)
@@ -62,25 +62,21 @@ namespace VirpilLedControls
             
             var device = _virpilDevices.FirstOrDefault(d => d.Pid == config.Pid);
             if (device == null)
-            {                
-                device = new VirpilDevice((ushort)(config.Pid & 0xFFFFu), ScriptLogger);
+            {  
+                device = new VirpilDevice(config.Pid, ScriptLogger);
                 _virpilDevices.Add(device);                
             }
 
-            var deviceProfile = app.ActiveProfile.Devices.FirstOrDefault(d => d.DeviceProfileID == device.SpadDeviceProfileID);
-            if (deviceProfile == null)
+            var hidDevice = HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
+                d.ProductId == device.Pid && 
+                d.VendorId == VirpilDevice.VendorId &&
+                d.Capabilities.FeatureReportByteLength > 0);
+            if (hidDevice == null)
             {
-                throw new ArgumentException($"Targetdevice {device.SpadDeviceProfileID} not found");
+                throw new ArgumentException($"Targetdevice {device.Pid} not found");
             }
-            if (deviceProfile.InputDevice is IPanelDevice panelDevice)
-            {
-                device.SetColors((data) => panelDevice.WriteFeatureData(data), config.Colors, config.Button, config.IntervalMs);
-            }
-            else
-            {
-                throw new ArgumentException($"Device {device.SpadDeviceProfileID} has no attached hidDevice");
-            }
-        
+            
+            device.SetColors((data) => hidDevice.WriteFeatureData(data), config.Colors, config.Button, config.IntervalMs);
         }
 
         public int NumberOfParameters => 1;

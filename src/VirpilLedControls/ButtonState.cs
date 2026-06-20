@@ -25,7 +25,6 @@ namespace VirpilLedControls
 
         public void SetColors(Action<byte[]> deviceWriter, IEnumerable<ButtonColor> configColors, int? configIntervalMs)
         {
-            // NEVER use lock {} as this can deadlock complete SPAD. Always use the buildin SmartLock which will automatically timeout and abort 
             _lockObject.Lock(() =>
             {
                 _cts?.Cancel();
