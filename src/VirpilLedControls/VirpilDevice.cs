@@ -7,19 +7,17 @@ namespace VirpilLedControls
     public class VirpilDevice
     {
         public ushort Pid { get; }
-        public string SerialNumber { get; }
-        public string Path { get; }
         internal const int VendorId = 0x3344;
 
         private readonly ButtonStateContainer _buttonStates;
         private readonly ILogger _logger;
-
-        public VirpilDevice(ushort pid, string serialNumber, string path, ILogger scriptLogger)
+                
+        // We assume only one device is present
+        public string SpadDeviceProfileID => $"{VendorId:4X}:{Pid:4X}:0";
+        public VirpilDevice(ushort pid, ILogger scriptLogger)
         {
             _logger = scriptLogger.CreateChildLogger(nameof(VirpilDevice));
             Pid = pid;
-            SerialNumber = serialNumber;
-            Path = path;
             _buttonStates = new ButtonStateContainer(scriptLogger);
             
         }
