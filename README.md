@@ -48,3 +48,8 @@ which controls the Virpil LED lights. As a result, this script is released under
 
 ## Limitations
 The script is designed to work with Virpil LED lights and may not work with other types of lights. Additionally, the script may not work with all versions of SPAD.neXt. The script is provided as-is and the author is not responsible for any damages or issues that may arise from using the script.
+
+## Building
+* Clone repository
+* Create a directory "local" and copy SPAD.Interfaces.dll from the target SPAD.neXt release to it.
+* Open the solution and build it
