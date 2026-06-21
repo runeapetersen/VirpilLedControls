@@ -54,11 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonColor.cs" />
-    <Compile Include="ButtonState.cs" />
-    <Compile Include="ButtonStateContainer.cs" />
+    <Compile Include="HexToDecConverter.cs" />
+    <Compile Include="Interfaces\ILockFactory.cs" />
+    <Compile Include="LedColor.cs" />
     <Compile Include="ColorIntensity.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="LockFactory.cs" />
     <Compile Include="PacketHandling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VirpilDevice.cs" />

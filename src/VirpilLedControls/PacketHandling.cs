@@ -17,9 +17,9 @@ namespace VirpilLedControls
         private const byte SlaveBoardGroupBase = 24;
         private const byte ExtraBoardGroupBase = 44;
 
-        internal static byte[] CreatePacket(BoardType boardType, int ledNumber, ColorIntensity red, ColorIntensity green, ColorIntensity blue)
+        internal static byte[] CreatePacket(BoardType boardType, uint ledNumber, ColorIntensity red, ColorIntensity green, ColorIntensity blue)
         {
-            if (ledNumber < 0 || ledNumber >= PacketLength - ColorOffsetIndex)
+            if (ledNumber >= PacketLength - ColorOffsetIndex)
                 throw new ArgumentOutOfRangeException(nameof(ledNumber), "LED index out of range for HID report.");
             var data = new byte[PacketLength];
             data[0] = HeaderByte;
@@ -31,7 +31,7 @@ namespace VirpilLedControls
             return data;
         }
 
-        internal static byte CommandIdForCommand(BoardType boardType, int ledNumber)
+        private static byte CommandIdForCommand(BoardType boardType, uint ledNumber)
         {
             switch (boardType)
             {
@@ -50,7 +50,7 @@ namespace VirpilLedControls
             }
         }
 
-        internal static byte ByteForColors(ColorIntensity red, ColorIntensity green, ColorIntensity blue)
+        private static byte ByteForColors(ColorIntensity red, ColorIntensity green, ColorIntensity blue)
         {
             byte b = 0b_1000_0000;
             b |= ByteForColor(red);
@@ -59,7 +59,7 @@ namespace VirpilLedControls
             return b;
         }
 
-        internal static byte ByteForColor(ColorIntensity color)
+        private static byte ByteForColor(ColorIntensity color)
         {
             switch (color)
             {

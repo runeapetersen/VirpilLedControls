@@ -7,6 +7,7 @@ using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Events;
 using SPAD.neXt.Interfaces.Scripting;
 using SPAD.neXt.Interfaces.Scripting.Stubs;
+using VirpilLedControls.Interfaces;
 
 // ReSharper disable UnusedType.Global
 
@@ -60,23 +61,25 @@ namespace VirpilLedControls
                 throw new ArgumentException("Invalid argument. IntervalMs is required when cycling more than one color.");
             }
             
+
+            
             var device = _virpilDevices.FirstOrDefault(d => d.Pid == config.Pid);
             if (device == null)
-            {  
-                device = new VirpilDevice(config.Pid, ScriptLogger);
+            {
+                var hidDevice = HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
+                    d.ProductId == device.Pid && 
+                    d.VendorId == VirpilDevice.VendorId &&
+                    d.Capabilities.FeatureReportByteLength > 0);
+            
+                if (hidDevice == null)
+                {
+                    throw new ArgumentException($"Targetdevice {device.Pid} not found");
+                }
+                device = new VirpilDevice(config.Pid, hidDevice, ScriptLogger, new LockFactory());
                 _virpilDevices.Add(device);                
             }
-
-            var hidDevice = HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
-                d.ProductId == device.Pid && 
-                d.VendorId == VirpilDevice.VendorId &&
-                d.Capabilities.FeatureReportByteLength > 0);
-            if (hidDevice == null)
-            {
-                throw new ArgumentException($"Targetdevice {device.Pid} not found");
-            }
             
-            device.SetColors((data) => hidDevice.WriteFeatureData(data), config.Colors, config.Button, config.IntervalMs);
+            device.SetColors(config.LedId, config.Colors, config.IntervalMs);
         }
 
         public int NumberOfParameters => 1;
