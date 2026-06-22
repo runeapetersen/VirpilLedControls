@@ -61,13 +61,11 @@ namespace VirpilLedControls
                 throw new ArgumentException("Invalid argument. IntervalMs is required when cycling more than one color.");
             }
             
-
-            
             var device = _virpilDevices.FirstOrDefault(d => d.Pid == config.Pid);
             if (device == null)
             {
                 var hidDevice = HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
-                    d.ProductId == device.Pid && 
+                    d.ProductId == config.Pid && 
                     d.VendorId == VirpilDevice.VendorId &&
                     d.Capabilities.FeatureReportByteLength > 0);
             
