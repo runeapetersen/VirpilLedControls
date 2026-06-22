@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HidLibrary;
 using System.Text.Json;
+using HidLibrary;
 using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Events;
 using SPAD.neXt.Interfaces.Scripting;
 using SPAD.neXt.Interfaces.Scripting.Stubs;
+using VirpilLedControls.Interfaces;
+
 // ReSharper disable UnusedType.Global
 
 namespace VirpilLedControls
@@ -17,20 +19,7 @@ namespace VirpilLedControls
         public Guid ID => Guid.Parse("5af37a59-2137-487a-8b1d-94a206d71d89");
         
         protected override void InitializeScript()
-        {
-            var devs = HidDevices.Enumerate(VirpilDevice.VendorId);
-            foreach (var dev in devs)
-            {
-                ScriptLogger.Info(
-                    $"Found device at path: {dev.DevicePath} ProductId: {dev.ProductId} VendorId: {dev.VendorId}");
-
-                if (dev.Capabilities.FeatureReportByteLength > 0)
-                {
-                    ScriptLogger.Info($"It has features!");
-                    _virpilDevices.Add(new VirpilDevice(dev.ProductId, dev.SerialNumber, dev.DevicePath,
-                        dev, ScriptLogger));
-                }
-            }
+        {          
         }
 
         protected override void DeinitializeScript()
@@ -42,7 +31,7 @@ namespace VirpilLedControls
 
         public void Execute(IApplication app, ISPADEventArgs eventArgs)
         {
-            throw new NotSupportedException("Unsupported operation. Use IScriptAction2.Execute");
+            // No need to throw. Interface IScriptaction2 ensures this is not called at all.
         }
 
         public void Execute(IApplication app, List<IEventActionParameter> actionParameters)
@@ -53,9 +42,9 @@ namespace VirpilLedControls
             {
                 throw new ArgumentException("Invalid argument. Expected a non-empty JSON string.");
             }
-
-            ScriptLogger.Info("Received config payload of length {Length}", rawConfigJson.Length);
             
+            ScriptLogger.Info("Received config payload of length {Length}", rawConfigJson.Length);
+
             var config = JsonSerializer.Deserialize<Config>(rawConfigJson);
             if (config == null)
             {
@@ -75,10 +64,20 @@ namespace VirpilLedControls
             var device = _virpilDevices.FirstOrDefault(d => d.Pid == config.Pid);
             if (device == null)
             {
-                throw new ArgumentException($"Invalid argument. No device found matching ProductId {config.Pid}.");
+                var hidDevice = HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
+                    d.ProductId == config.Pid && 
+                    d.VendorId == VirpilDevice.VendorId &&
+                    d.Capabilities.FeatureReportByteLength > 0);
+            
+                if (hidDevice == null)
+                {
+                    throw new ArgumentException($"Targetdevice {device.Pid} not found");
+                }
+                device = new VirpilDevice(config.Pid, hidDevice, ScriptLogger, new LockFactory());
+                _virpilDevices.Add(device);                
             }
-
-            device.SetColors(config.Colors, config.Button, config.IntervalMs);
+            
+            device.SetColors(config.LedId, config.Colors, config.IntervalMs);
         }
 
         public int NumberOfParameters => 1;

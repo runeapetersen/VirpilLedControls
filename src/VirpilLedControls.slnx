@@ -2,8 +2,8 @@
   <Folder Name="/SolutionItems/">
     <File Path="../README.md" />
   </Folder>
-  <Project Path="VirpilLedControls.Tests/VirpilLedControls.Tests.csproj">
+  <Project Path="VirpilLedControls.Tests/VirpilLedControls.Tests.csproj" Id="1600a628-325f-4f02-8a01-797cdfed0e2a">
     <Build Solution="Release|*" Project="false" />
   </Project>
-  <Project Path="VirpilLedControls/VirpilLedControls.csproj" />
+  <Project Path="VirpilLedControls/VirpilLedControls.csproj" Id="3dd17eac-7b8a-45af-857d-4452024c86c4" />
 </Solution>

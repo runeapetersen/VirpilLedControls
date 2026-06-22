@@ -1,6 +1,6 @@
 ﻿namespace VirpilLedControls
 {
-    public class ButtonColor
+    public class LedColor
     {
         public ColorIntensity R { get; set; }
         public ColorIntensity G { get; set; }
