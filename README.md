@@ -51,5 +51,6 @@ The script is designed to work with Virpil LED lights and may not work with othe
 
 ## Building
 * Clone repository
-* Create a directory "local" and copy SPAD.Interfaces.dll from the target SPAD.neXt release to it.
-* Open the solution and build it
+* Create a directory named `local` in the root of the newly cloned repository
+* Copy SPAD.Interfaces.dll and SPAD.neXt.Devices.dll from your SPAD.neXt installation folder to the new `local` directory
+* Open the solution file in the `src` directory and build the solution.

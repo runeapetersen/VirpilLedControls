@@ -39,12 +39,10 @@
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="SPAD.Interfaces">
-      <HintPath>H:\MSFS2020-Tooling\SPAD.neXt\SPAD.Interfaces.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\local\SPAD.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="SPAD.neXt.Devices">
-      <HintPath>H:\MSFS2020-Tooling\SPAD.neXt\SPAD.neXt.Devices.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\local\SPAD.neXt.Devices.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
