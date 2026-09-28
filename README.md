@@ -12,7 +12,8 @@ As a result it allows dynamic lighting control integrated directly into your SPA
 - **Instrumented via JSON**: Configuration is handled through a simple JSON structure passed to the script as an argument.
 
 ## Installation:
-1. **Place in SPAD.neXt Addons directory**: Unpack the DLL files into the SPAD.neXt Addons directory, normally located in %userprofile%\Documents\SPAD.neXt\Addons. Create the Addons directory if it does not exist. SPAD.neXt will automatically load the assembly on startup and initialize the script. See the official documentation at https://docs.spadnext.com/extending-and-apis/scripting-interface/c-scripting-precompile for information.
+1. **Place in SPAD.neXt Addons directory**: Unpack the DLL files from the recent release (see https://github.com/runeapetersen/VirpilLedControls/releases/) into the SPAD.neXt Addons directory, normally located in %userprofile%\Documents\SPAD.neXt\Addons. Create the Addons directory if it does not exist. SPAD.neXt will automatically load the assembly on startup and initialize the script. See the official documentation at https://docs.spadnext.com/extending-and-apis/scripting-interface/c-scripting-precompile for information.  
+**Note that if you are getting errors from SPAD.neXt concerning blocked files the included text file "unblocking_files_info.txt" describes how to get around this.**
 2. **Configure SPAD.neXt**: When creating a new rule or state change, you can trigger the script by specifying "External Script" as an action and picking "VirpilLightAutomationScript" from the dropdown. Paste the Json snippet defined in the Usage section below into the provided argument text box.
 
 ![Select Script dialog](https://github.com/runeapetersen/VirpilLedControls/blob/main/select_script.png?raw=true)

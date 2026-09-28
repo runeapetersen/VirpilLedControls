@@ -69,9 +69,14 @@
     <None Include="StrongName.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.12" />
     <PackageReference Include="System.Memory" Version="4.6.3" />
-    <PackageReference Include="System.Text.Json" Version="10.0.9" />
+    <PackageReference Include="System.Text.Json" Version="10.0.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="unblocking_files_info.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="PostBuildMacros">
@@ -89,7 +94,7 @@
   </PostBuildEventDependsOn>
     <PostBuildEvent>if $(ConfigurationName) == Release (
 powershell Remove-Item '$(TargetDir)*.zip'
-powershell Compress-Archive -Path '$(TargetDir)*.dll' -DestinationPath '$(TargetDir)\VirpilLedControls_v@(VersionNumber).zip' -Force
+powershell Compress-Archive -Path '$(TargetDir)*.dll','$(TargetDir)*.txt' -DestinationPath '$(TargetDir)\VirpilLedControls_v@(VersionNumber).zip' -Force
 )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
