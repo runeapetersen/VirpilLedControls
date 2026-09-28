@@ -1,0 +1,23 @@
+﻿Sometimes when you download files from the internet, Windows may block them for security reasons. 
+For SPAD, this manifests in load errors related to the assemblies in this Addon (you will see an error dialog when SPAD loads explaining that the files are blocked by Windows).
+To unblock all DLL files in the current directory, you can use the following PowerShell command:
+ 
+Unblock-File -Path ".\*.dll" -verbose 
+
+I can't supply it as a script because PowerShell scripts are blocked by default on most Windows systems,
+ so you will need to copy and paste it into a PowerShell window:
+ 
+1. Open PowerShell as Administrator.
+2. Navigate to the 'Addons' directory where the DLL files are located using the `cd` command.
+3. Copy and paste the command above into the PowerShell window and press Enter.
+
+You will see output similar to this for each file that is unblocked:
+
+VERBOSE: Performing the operation "Unblock-File" on target
+"C:\Users\foo\Documents\SPAD.neXt\Addons\Microsoft.Bcl.AsyncInterfaces.dll".
+<...etc...>
+
+This should allow SPAD to load the files without any errors. 
+If you continue to experience issues, ensure that all relevant files have been unblocked and that your antivirus software is not interfering with the loading process.
+
+This will not be a problem for users compiling their own DLLs from the supplied source code.
