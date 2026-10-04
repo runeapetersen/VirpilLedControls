@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Moq;
 using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.HID;
+using SPAD.neXt.Interfaces.Logging;
 using VirpilLedControls.Interfaces;
 using Xunit;
 
@@ -15,15 +16,16 @@ namespace VirpilLedControls.Tests
         private Mock<ILockFactory> _mockLockFactory = new Mock<ILockFactory>();
         private Mock<ISmartLock> _mockLock = new Mock<ISmartLock>();
         private Mock<IHidDevice> _mockHidDevice = new Mock<IHidDevice>();
-
-        private Mock<SPAD.neXt.Interfaces.Logging.ILogger> _mockLogger =
-            new Mock<SPAD.neXt.Interfaces.Logging.ILogger>();
-
+        
+        private Mock<IScriptLoggerFactory> _mockLogger =
+            new Mock<IScriptLoggerFactory>();
+        private Mock<ILogger> _mockLoggerInstance = new Mock<ILogger>();
+            
         private void WireMocks()
         {
             _mockLockFactory.Setup(m => m.CreateLock(It.IsAny<string>())).Returns(_mockLock.Object);
             _mockLock.Setup(m => m.Lock(It.IsAny<Action>())).Callback((Action a) => { a(); });
-            _mockLogger.Setup(m => m.CreateChildLogger(It.IsAny<string>())).Returns(_mockLogger.Object);
+            _mockLogger.Setup(m => m.CreateLogger(It.IsAny<string>())).Returns(_mockLoggerInstance.Object);
         }
 
         [Fact]
@@ -32,7 +34,7 @@ namespace VirpilLedControls.Tests
             WireMocks();
             VirpilDevice device =
                 new VirpilDevice(1999, _mockHidDevice.Object, _mockLogger.Object, _mockLockFactory.Object);
-            Assert.Throws<ArgumentException>(() => device.SetColors(1, Enumerable.Empty<LedColor>().ToArray(), 50));
+            Assert.Throws<ArgumentException>(() => device.SetColors(1, PacketHandling.BoardType.OnBoard, Enumerable.Empty<LedColor>().ToArray(), 50));
         }
 
         [Fact]
@@ -41,7 +43,7 @@ namespace VirpilLedControls.Tests
             WireMocks();
             VirpilDevice device =
                 new VirpilDevice(1999, _mockHidDevice.Object, _mockLogger.Object, _mockLockFactory.Object);
-            Assert.Throws<ArgumentNullException>(() => device.SetColors(1, null, 50));
+            Assert.Throws<ArgumentNullException>(() => device.SetColors(1, PacketHandling.BoardType.OnBoard, null, 50));
         }
 
         [Fact]
@@ -50,8 +52,8 @@ namespace VirpilLedControls.Tests
             WireMocks();
             VirpilDevice device =
                 new VirpilDevice(1999, _mockHidDevice.Object, _mockLogger.Object, _mockLockFactory.Object);
-            device.SetColors(1, GrabColors(2), 50);
-            var cancellationTokenSource =CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            device.SetColors(1, PacketHandling.BoardType.OnBoard, GrabColors(2), 50);
+            var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
             cancellationTokenSource.CancelAfter(200);
             while (_mockHidDevice.Invocations.Count < 2)
             {
@@ -66,7 +68,7 @@ namespace VirpilLedControls.Tests
             WireMocks();
             VirpilDevice device =
                 new VirpilDevice(1999, _mockHidDevice.Object, _mockLogger.Object, _mockLockFactory.Object);
-            device.SetColors(1, GrabColors(1), 50);
+            device.SetColors(1, PacketHandling.BoardType.OnBoard, GrabColors(1), 50);
             var cancellationTokenSource =CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
             cancellationTokenSource.CancelAfter(200);
             await Task.Delay(TimeSpan.FromMilliseconds(150), cancellationTokenSource.Token);

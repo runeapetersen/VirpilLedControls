@@ -55,14 +55,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HexToDecConverter.cs" />
+    <Compile Include="Interfaces\IHidDevices.cs" />
     <Compile Include="Interfaces\ILockFactory.cs" />
+    <Compile Include="Interfaces\IScriptLoggerFactory.cs" />
     <Compile Include="LedColor.cs" />
     <Compile Include="ColorIntensity.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="LockFactory.cs" />
     <Compile Include="PacketHandling.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StaticDecoupling\HidDevices.cs" />
+    <Compile Include="StaticDecoupling\LockFactory.cs" />
+    <Compile Include="StaticDecoupling\ScriptLoggerFactory.cs" />
     <Compile Include="VirpilDevice.cs" />
+    <Compile Include="VirpilDevices.cs" />
     <Compile Include="VirpilLightAutomationScript.cs" />
   </ItemGroup>
   <ItemGroup>

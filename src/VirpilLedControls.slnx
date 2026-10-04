@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/SolutionItems/">
+    <File Path="../LED_control_notes.md" />
     <File Path="../README.md" />
   </Folder>
   <Project Path="VirpilLedControls.Tests/VirpilLedControls.Tests.csproj" Id="1600a628-325f-4f02-8a01-797cdfed0e2a">

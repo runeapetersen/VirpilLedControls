@@ -2,7 +2,7 @@
 
 namespace VirpilLedControls
 {
-    internal static class PacketHandling
+    public static class PacketHandling
     {
         // HID Packet Structure Constants
         private const int PacketLength = 38;
@@ -10,46 +10,21 @@ namespace VirpilLedControls
         private const byte FooterByte = 0xF0;
         private const int ColorOffsetIndex = 4;
 
-        // LED Group Base Indices for Command ID Calculation
-        private const byte DefaultGroupBase = 0;
-        private const byte AddBoardGroupBase = 0;       // Uses raw ledNumber
-        private const byte OnBoardGroupBase = 4;
-        private const byte SlaveBoardGroupBase = 24;
-        private const byte ExtraBoardGroupBase = 44;
-
-        internal static byte[] CreatePacket(BoardType boardType, uint ledNumber, ColorIntensity red, ColorIntensity green, ColorIntensity blue)
+        public static byte[] CreatePacket(BoardType boardType, uint ledNumber, ColorIntensity red, ColorIntensity green, ColorIntensity blue)
         {
             if (ledNumber >= PacketLength - ColorOffsetIndex)
                 throw new ArgumentOutOfRangeException(nameof(ledNumber), "LED index out of range for HID report.");
             var data = new byte[PacketLength];
             data[0] = HeaderByte;
             data[1] = (byte)boardType;
-            data[2] = CommandIdForCommand(boardType, ledNumber);
+            if (boardType == BoardType.ResetToColorReserved || boardType == BoardType.ResetToDefaultsReserved) // Force colour info to first LED slot for reset commands
+                ledNumber = 1;
             data[ledNumber + ColorOffsetIndex] = ByteForColors(red, green, blue);
             data[PacketLength - 1] = FooterByte;
 
             return data;
         }
-
-        private static byte CommandIdForCommand(BoardType boardType, uint ledNumber)
-        {
-            switch (boardType)
-            {
-                case BoardType.Default:
-                    return DefaultGroupBase;
-                case BoardType.AddBoard:
-                    return (byte)(AddBoardGroupBase + ledNumber);
-                case BoardType.OnBoard:
-                    return (byte)(OnBoardGroupBase + ledNumber);
-                case BoardType.SlaveBoard:
-                    return (byte)(SlaveBoardGroupBase + ledNumber);
-                case BoardType.ExtraBoard:
-                    return (byte)(ExtraBoardGroupBase + ledNumber);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(boardType), boardType, null);
-            }
-        }
-
+        
         private static byte ByteForColors(ColorIntensity red, ColorIntensity green, ColorIntensity blue)
         {
             byte b = 0b_1000_0000;
@@ -76,32 +51,42 @@ namespace VirpilLedControls
             }
         }
 
+        /// <summary>
+        /// Notes to self: The board type is determined by looking at the VPC Configuration Tool.
+        /// A controller seems to consist of a an on-board controller and up to 4 slave boards.
+        /// The on-board controller is always present, and the slave boards are optional. The board type is used to determine which group of LEDs to control.
+        /// Joystick attachments and slaved control panels are listed as slave boards in the VPC Configuration Tool, and are assigned a slave board number 1-4.
+        /// </summary>
         public enum BoardType : byte
         {
             /// <summary>
-            /// Not necessarily a board type, but is used when setting the LEDs to default
+            /// Reserved type for setting the LEDs to their firmware defaults. Ignores color information in the packet.
             /// </summary>
-            Default = 0x64,
-
+            ResetToDefaultsReserved = 0x64,
             /// <summary>
-            /// LEDs which are part of a board that is directly attached to the target board (e.g. a joystick)
+            /// Reserved type for setting the LEDs to a specific color
             /// </summary>
-            AddBoard = 0x65,
-
+            ResetToColorReserved = 0x65,
             /// <summary>
-            /// LEDs which are on the board that is directly connected to USB
+            /// On-board controller
             /// </summary>
             OnBoard = 0x66,
-
             /// <summary>
-            /// LEDs which are on a slave board connected to a parent board which is directly connected to USB
+            /// Slave Board 1 controller
             /// </summary>
-            SlaveBoard = 0x67,
-
+            SlaveBoard1 = 0x67,
             /// <summary>
-            /// LEDs used by boards such as the Alpha Prime (why? who knows!)
+            /// Slave Board 2 controller
             /// </summary>
-            ExtraBoard = 0x68,
+            SlaveBoard2 = 0x68,
+            /// <summary>
+            /// Slave Board 3 controller
+            /// </summary>
+            SlaveBoard3 = 0x69,
+            /// <summary>
+            /// Slave Board 4 controller
+            /// </summary>
+            SlaveBoard4 = 0x6A
         }
     }
 }
