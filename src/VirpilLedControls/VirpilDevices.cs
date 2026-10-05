@@ -39,7 +39,7 @@ namespace VirpilLedControls
 
                     if (hidDevice == null)
                     {
-                        throw new ArgumentException($"Targetdevice {pid} not found");
+                        throw new ArgumentException($"Target device {pid} not found");
                     }
                     var device = new VirpilDevice(pid, hidDevice, _scriptLoggerFactory, _lockFactory);
                     _devices.Add(device);
