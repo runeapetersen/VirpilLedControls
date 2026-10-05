@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using SPAD.neXt.Interfaces.HID;
 
-public interface IHidDevices
+namespace VirpilLedControls.Interfaces
 {
-    IEnumerable<IHidDevice> Enumerate(int vendorId);
+    public interface IHidDevices
+    {
+        IEnumerable<IHidDevice> Enumerate(int vendorId);
+    }
 }
