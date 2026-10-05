@@ -19,27 +19,28 @@ As a result it allows dynamic lighting control integrated directly into your SPA
 ![Select Script dialog](https://github.com/runeapetersen/VirpilLedControls/blob/main/select_script.png?raw=true)
 
 ## Usage
-1.  **Get Device IDs**: Open the VPC Configuration Tool, go to your device view, and note the Vendor ID (VID) and Product ID (PID). Use these values exactly as displayed (check if they are hex or decimal).
-2.  **Identify the LED**: Find the LED number corresponding to your target LED in the VPC tool's monitoring tab.
-3.  **Build Your Configuration**: Create a single-line JSON object using the template below:
+1.  **Get Device IDs**: Open the VPC Configuration Tool, go to your device view, and note the Product ID (PID) hexadecimal value. Use this value exactly as displayed.
+2.  **Identify the LED**: Find the LED number corresponding to your target LED in the VPC tool's monitoring tab. If the LED is on a slave board make note of the board slot number displayed. You will need to specify it later.
+3. **(OPTIONAL)**: Use the VPC_LED_Control.exe tool to test your desired LED color and confirm the LED number and board type. This is optional but can help avoid mistakes.
+4.  **Build Your Configuration**: Create a single-line JSON object using the template below:
 ```
-{"Vid":"3344","Pid":"4259","LedId":3,"Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
+{"Pid":"4259","LedId":3,"BoardType":"OnBoard","Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
 ```
-Note: Although formatted on one line, the structure is: Vid→Pid→Led→ColorArray→Interval. Copy-paste exactly as shown.
+Note: Although formatted on one line, the structure should conform to: Pid→LedId→BoardType→Colors→IntervalMs. It's easier to spot errors if you stick to the suggested order for all script invocations.
 
 **JSON Field Reference:**
 
 | Field        | Description | Required? |
 |:-------------|:---------------------------------|:----------|
-| `Vid`        | Device Vendor ID (from VPC tool) | ✅ Yes |
 | `Pid`        | Device Product ID (from VPC tool) | ✅ Yes |
 | `LedId`      | Target LED number | ✅ Yes |
+| `BoardType`        | Board type (`"OnBoard"`, `"SlaveBoard1"`, `"SlaveBoard2"`, `"SlaveBoard3"`, `"SlaveBoard4"`) | ❌ Optional (will assume "OnBoard" if omitted) |
 | `Colors`     | Array of RGB states (`"Off"`, `"Thirty"`, `"Sixty"`, `"Full"`) | ✅ Yes |
 | `IntervalMs` | Milliseconds between color changes when cycling | ❌ Optional (required if using >1 color) |
-**Technical note**: The `Vid` and `Pid` fields are provided as strings, not integers. The script expects these values to be in hexadecimal as reported by the VPC tool so the user can enter the values as reported without having to convert them first.
+**Technical note**: The `Pid` field is provided as a string. The script expects this value to be in hexadecimal as reported by the VPC tool. No conversion required.
 
-4.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
-5.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
+5.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
+6.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
 
 If you are encountering errors, remember to check the log files at %appdata%\SPAD.neXt\logs. The script will write any messages to the standard application log.
 

@@ -1,7 +1,7 @@
 ﻿using SPAD.neXt.Interfaces;
 using VirpilLedControls.Interfaces;
 
-namespace VirpilLedControls
+namespace VirpilLedControls.StaticDecoupling
 {
     public class LockFactory : ILockFactory
     {
