@@ -39,8 +39,8 @@ Note: Although formatted on one line, the structure should conform to: Pid→Led
 | `IntervalMs` | Milliseconds between color changes when cycling | ❌ Optional (required if using >1 color) |
 **Technical note**: The `Pid` field is provided as a string. The script expects this value to be in hexadecimal as reported by the VPC tool. No conversion required.
 
-4.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
-5.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
+5.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
+6.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
 
 If you are encountering errors, remember to check the log files at %appdata%\SPAD.neXt\logs. The script will write any messages to the standard application log.
 
