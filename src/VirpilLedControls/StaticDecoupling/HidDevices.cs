@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using SPAD.neXt.Interfaces.HID;
 
-public class HidDevices : IHidDevices
+namespace VirpilLedControls.StaticDecoupling
 {
-    public IEnumerable<IHidDevice> Enumerate(int vendorId)
+    public class HidDevices : VirpilLedControls.Interfaces.IHidDevices
     {
-        return HidLibrary.HidDevices.Enumerate(vendorId);
+        public IEnumerable<IHidDevice> Enumerate(int vendorId)
+        {
+            return HidLibrary.HidDevices.Enumerate(vendorId);
+        }
     }
 }
