@@ -52,9 +52,9 @@ namespace VirpilLedControls.Tests
             WireMocks();
             VirpilDevice device =
                 new VirpilDevice(1999, _mockHidDevice.Object, _mockLogger.Object, _mockLockFactory.Object);
-            device.SetColors(1, PacketHandling.BoardType.OnBoard, GrabColors(2), 50);
+            device.SetColors(1, PacketHandling.BoardType.OnBoard, GrabColors(2), 250);
             var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
-            cancellationTokenSource.CancelAfter(200);
+            cancellationTokenSource.CancelAfter(500);
             while (_mockHidDevice.Invocations.Count < 2)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(50), cancellationTokenSource.Token);

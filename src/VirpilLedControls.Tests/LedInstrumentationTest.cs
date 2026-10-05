@@ -5,7 +5,7 @@ namespace VirpilLedControls.Tests
 {
     public class LedInstrumentationTest
     {
-        [Fact]
+        [Fact(Skip = "This test is for instrumentation purposes only and requires a Virpil device to be connected.")]
         public void CallHidDevice()
         {
             var hidDevice = HidLibrary.HidDevices.Enumerate(VirpilDevice.VendorId).FirstOrDefault(d =>
