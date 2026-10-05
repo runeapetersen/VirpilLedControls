@@ -67,7 +67,7 @@ namespace VirpilLedControls
                 if (configIntervalMs == null)
                     throw new ArgumentException("configIntervalMs is required when cycling more than one color.", nameof(configIntervalMs));
                 if (configIntervalMs < 250)
-                    throw new ArgumentException("configIntervalMs must be greater than 250ms.", nameof(configIntervalMs));
+                    throw new ArgumentException("configIntervalMs must be at least 250ms.", nameof(configIntervalMs));
             }
             
             _lock.Lock(() =>
