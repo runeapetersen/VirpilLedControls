@@ -58,7 +58,6 @@ namespace VirpilLedControls.DeviceControl
             return res;
         }
 
-        // TODO: delegate commands to device. Caller shouldn't have to call GetByPid and then call SetColors on each device. Instead, VirpilDevices should handle that internally.
         public void ExecuteCommand(LedCommand command)
         {
             if (command == null)
