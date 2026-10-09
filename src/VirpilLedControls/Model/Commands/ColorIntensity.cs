@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VirpilLedControls
+namespace VirpilLedControls.Model.Commands
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum ColorIntensity
