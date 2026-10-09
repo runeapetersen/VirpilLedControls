@@ -6,7 +6,7 @@ namespace VirpilLedControls.Model.Commands
     {
         public LedColor Color { get; set; }
 
-        protected override void ValidateInternal(StringBuilder errors)
+        protected override void ValidateInternalSingleLed(StringBuilder errors)
         {
             if (Color == null)
             {

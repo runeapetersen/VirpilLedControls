@@ -24,10 +24,9 @@ namespace VirpilLedControls.StaticDecoupling
 
             _lock.EnterReadLock();
 
-            CheckDisposeAndThrow();
-
             try
             {
+                CheckDisposeAndThrow();
                 return HidLibrary.HidDevices.Enumerate(vendorId);
             }
             finally

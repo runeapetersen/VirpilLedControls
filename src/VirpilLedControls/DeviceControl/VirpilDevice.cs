@@ -181,10 +181,11 @@ namespace VirpilLedControls.DeviceControl
 
             StopTasks(tasksToStop);
 
-            _deviceLevelTask = new LedColorTask();
-            _deviceLevelTask.Task = Task.Factory.StartNew(
-                () => ProcessColorTask(1, command.BoardType, colors, 0, _deviceLevelTask.Token),
-                _deviceLevelTask.Token);
+            var newTask = new LedColorTask();
+            _deviceLevelTask = newTask;
+            newTask.Task = Task.Factory.StartNew(
+                () => ProcessColorTask(1, command.BoardType, colors, 0, newTask.Token),
+                newTask.Token);
         }
 
         private void ProcessColorTask(uint ledId, PacketHandling.BoardType boardType, LedColor[] colors,
@@ -267,6 +268,10 @@ namespace VirpilLedControls.DeviceControl
                         try
                         {
                             Task?.GetAwaiter().GetResult();
+                        }
+                        catch (OperationCanceledException) when (_cancellationTokenSource.IsCancellationRequested)
+                        {
+                            // Expected when the task is cancelled before or during execution.
                         }
                         catch (Exception ex)
                         {
