@@ -54,21 +54,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HexToDecConverter.cs" />
+    <Compile Include="DeviceControl\PacketHandling.cs" />
+    <Compile Include="DeviceControl\VirpilDevice.cs" />
+    <Compile Include="DeviceControl\VirpilDevices.cs" />
+    <Compile Include="Exceptions\ValidationException.cs" />
     <Compile Include="Interfaces\IHidDevices.cs" />
     <Compile Include="Interfaces\ILockFactory.cs" />
     <Compile Include="Interfaces\IScriptLoggerFactory.cs" />
-    <Compile Include="LedColor.cs" />
-    <Compile Include="ColorIntensity.cs" />
-    <Compile Include="Config.cs" />
-    <Compile Include="PacketHandling.cs" />
+    <Compile Include="Interfaces\IVirpilDevice.cs" />
+    <Compile Include="Model\Commands\ColorCycleCommand.cs" />
+    <Compile Include="Model\Commands\ColorIntensity.cs" />
+    <Compile Include="Model\Commands\DeviceCommand.cs" />
+    <Compile Include="Model\Commands\DoNothingCommand.cs" />
+    <Compile Include="Model\Commands\ILedCommandFactory.cs" />
+    <Compile Include="Model\Commands\LedColor.cs" />
+    <Compile Include="Model\Commands\LedCommand.cs" />
+    <Compile Include="Model\Commands\ResetToFirmwareColoursCommand.cs" />
+    <Compile Include="Model\Commands\LegacyCommand.cs" />
+    <Compile Include="Model\Commands\SetDeviceSingleColorCommand.cs" />
+    <Compile Include="Model\Commands\SingleLedCommand.cs" />
+    <Compile Include="Model\Commands\SolidColorCommand.cs" />
+    <Compile Include="Model\Commands\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script\VirpilLightAutomationScript.cs" />
+    <Compile Include="Serialization\HexToDecConverter.cs" />
+    <Compile Include="Serialization\LedCommandFactory.cs" />
     <Compile Include="StaticDecoupling\HidDevices.cs" />
     <Compile Include="StaticDecoupling\LockFactory.cs" />
     <Compile Include="StaticDecoupling\ScriptLoggerFactory.cs" />
-    <Compile Include="VirpilDevice.cs" />
-    <Compile Include="VirpilDevices.cs" />
-    <Compile Include="VirpilLightAutomationScript.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="StrongName.snk" />

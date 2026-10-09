@@ -1,4 +1,4 @@
-﻿namespace VirpilLedControls
+﻿namespace VirpilLedControls.Model.Commands
 {
     public class LedColor
     {

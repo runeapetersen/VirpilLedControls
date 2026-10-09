@@ -20,29 +20,67 @@ As a result it allows dynamic lighting control integrated directly into your SPA
 
 ## Usage
 1.  **Get Device IDs**: Open the VPC Configuration Tool, go to your device view, and note the Product ID (PID) hexadecimal value. Use this value exactly as displayed.
-2.  **Identify the LED**: Find the LED number corresponding to your target LED in the VPC tool's monitoring tab. If the LED is on a slave board make note of the board slot number displayed. You will need to specify it later.
-3. **(OPTIONAL)**: Use the VPC_LED_Control.exe tool to test your desired LED color and confirm the LED number and board type. This is optional but can help avoid mistakes.
-4.  **Build Your Configuration**: Create a single-line JSON object using the template below:
+2.  **Identify the LED**: For commands targeting an individual LED, find its number in the VPC tool's monitoring tab. If the LED is on a slave board, note the board slot number displayed.
+3.  **Build Your Configuration**: Create a single-line JSON object. Each command includes a `Type` discriminator:
+
+| `Type` | Purpose | Additional fields | Notes |
+|:--|:--|:--|:--|
+| `SingleColor` | Set one LED to a fixed color. | `LedId`, `BoardType`, `Color` | |
+| `ColorCycle` | Cycle one LED through multiple colors. | `LedId`, `BoardType`, `Colors`, `IntervalMs` | |
+| `DeviceSingleColor` | Set a device-level color. | `Color` | Device-level command. Cancels any active button-level commands for this device. |
+| `DeviceFirmwareDefaultColor` | Reset the device to its firmware default colors. | None | Device-level command. Cancels any active button-level commands for this device. |
+
+**Field Reference:**
+
+| Field type | Allowed Values | Description |
+|:--|:--|:--|
+| `Pid` | Hexadecimal Product ID string | Device Product ID from the VPC Configuration Tool; no conversion is required. |
+| `LedId` | LED number | LED to control on the selected board. |
+| `BoardType` | `OnBoard`, `SlaveBoard1`, `SlaveBoard2`, `SlaveBoard3`, `SlaveBoard4` | Selects the controller containing the LED. `OnBoard` is the device's built-in controller. `SlaveBoard1`–`SlaveBoard4` correspond to the numbered slave-board slots shown in the VPC Configuration Tool; slave boards may be joystick attachments or slaved control panels. |
+| RGB components (`R`, `G`, `B`) | `Off`, `Thirty`, `Sixty`, `Full` | Intensity for the red, green, or blue channel in a `Color`. |
+| `IntervalMs` | 250 ms or greater | Delay between colors in a `ColorCycle`. |
+
+For a slave-board LED, set `BoardType` to the corresponding slot and `LedId` to the LED number shown for that board in the VPC tool. See the `SlaveBoard1` and `SlaveBoard2` examples below.
+
+Example: set LED 3 on the onboard board to green:
 ```
-{"Pid":"4259","LedId":3,"BoardType":"OnBoard","Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
+{"Type":"SingleColor","Pid":"4259","LedId":3,"BoardType":"OnBoard","Color":{"R":"Off","G":"Full","B":"Off"}}
 ```
-Note: Although formatted on one line, the structure should conform to: Pid→LedId→BoardType→Colors→IntervalMs. It's easier to spot errors if you stick to the suggested order for all script invocations.
 
-**JSON Field Reference:**
+Example: set LED 3 on slave board 1 to green:
+```
+{"Type":"SingleColor","Pid":"4259","LedId":3,"BoardType":"SlaveBoard1","Color":{"R":"Off","G":"Full","B":"Off"}}
+```
 
-| Field        | Description | Required? |
-|:-------------|:---------------------------------|:----------|
-| `Pid`        | Device Product ID (from VPC tool) | ✅ Yes |
-| `LedId`      | Target LED number | ✅ Yes |
-| `BoardType`        | Board type (`"OnBoard"`, `"SlaveBoard1"`, `"SlaveBoard2"`, `"SlaveBoard3"`, `"SlaveBoard4"`) | ❌ Optional (will assume "OnBoard" if omitted) |
-| `Colors`     | Array of RGB states (`"Off"`, `"Thirty"`, `"Sixty"`, `"Full"`) | ✅ Yes |
-| `IntervalMs` | Milliseconds between color changes when cycling | ❌ Optional (required if using >1 color) |
-**Technical note**: The `Pid` field is provided as a string. The script expects this value to be in hexadecimal as reported by the VPC tool. No conversion required.
+Example: cycle LED 3 on slave board 2 between green and red every 500 ms:
+```
+{"Type":"ColorCycle","Pid":"4259","LedId":3,"BoardType":"SlaveBoard2","Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
+```
 
-5.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
-6.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
+Example: cycle LED 3 between green and red every 500 ms:
+```
+{"Type":"ColorCycle","Pid":"4259","LedId":3,"BoardType":"OnBoard","Colors":[{"R":"Off","G":"Full","B":"Off"},{"R":"Full","G":"Off","B":"Off"}],"IntervalMs":500}
+```
+
+Example: set a device-level color:
+```
+{"Type":"DeviceSingleColor","Pid":"4259","Color":{"R":"Off","G":"Full","B":"Off"}}
+```
+
+Example: reset a device to its firmware default colors:
+```
+{"Type":"DeviceFirmwareDefaultColor","Pid":"4259"}
+```
+
+4.  **Apply in SPAD.neXt**: Create a new rule → Add Action → Select `External Script` → Choose `VirpilLightAutomationScript` → Paste your JSON string into the argument box.
+5.  **Troubleshooting**: If lights don't respond, check `%appdata%\SPAD.neXt\logs`. The script logs all configuration payloads and HID errors there.
 
 If you are encountering errors, remember to check the log files at %appdata%\SPAD.neXt\logs. The script will write any messages to the standard application log.
+
+## Automatic LED Reset
+The addon resets any devices it has controlled to their firmware default colors when SPAD.neXt shuts down.
+
+If you want to have power state changes trigger LED resets, you will need to set up custom event triggers. Some experimentation may be required depending on the aircraft.
 
 ## Attribution
 This project was inspired by https://github.com/charliefoxtwo/Virpil-Communicator and implements logic adapted from that library to in order to create the data structure

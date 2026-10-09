@@ -1,6 +1,7 @@
 ﻿using System;
+using VirpilLedControls.Model.Commands;
 
-namespace VirpilLedControls
+namespace VirpilLedControls.DeviceControl
 {
     public static class PacketHandling
     {
@@ -10,21 +11,24 @@ namespace VirpilLedControls
         private const byte FooterByte = 0xF0;
         private const int ColorOffsetIndex = 4;
 
-        public static byte[] CreatePacket(BoardType boardType, uint ledNumber, ColorIntensity red, ColorIntensity green, ColorIntensity blue)
+        public static byte[] CreatePacket(BoardType boardType, uint ledNumber, ColorIntensity red, ColorIntensity green,
+            ColorIntensity blue)
         {
             if (ledNumber >= PacketLength - ColorOffsetIndex)
                 throw new ArgumentOutOfRangeException(nameof(ledNumber), "LED index out of range for HID report.");
             var data = new byte[PacketLength];
             data[0] = HeaderByte;
             data[1] = (byte)boardType;
-            if (boardType == BoardType.ResetToColorReserved || boardType == BoardType.ResetToDefaultsReserved) // Force colour info to first LED slot for reset commands
+            if (boardType == BoardType.ResetToColorReserved ||
+                boardType ==
+                BoardType.ResetToDefaultsReserved) // Force colour info to first LED slot for reset commands
                 ledNumber = 1;
             data[ledNumber + ColorOffsetIndex] = ByteForColors(red, green, blue);
             data[PacketLength - 1] = FooterByte;
 
             return data;
         }
-        
+
         private static byte ByteForColors(ColorIntensity red, ColorIntensity green, ColorIntensity blue)
         {
             byte b = 0b_1000_0000;
@@ -63,26 +67,32 @@ namespace VirpilLedControls
             /// Reserved type for setting the LEDs to their firmware defaults. Ignores color information in the packet.
             /// </summary>
             ResetToDefaultsReserved = 0x64,
+
             /// <summary>
             /// Reserved type for setting the LEDs to a specific color
             /// </summary>
             ResetToColorReserved = 0x65,
+
             /// <summary>
             /// On-board controller
             /// </summary>
             OnBoard = 0x66,
+
             /// <summary>
             /// Slave Board 1 controller
             /// </summary>
             SlaveBoard1 = 0x67,
+
             /// <summary>
             /// Slave Board 2 controller
             /// </summary>
             SlaveBoard2 = 0x68,
+
             /// <summary>
             /// Slave Board 3 controller
             /// </summary>
             SlaveBoard3 = 0x69,
+
             /// <summary>
             /// Slave Board 4 controller
             /// </summary>

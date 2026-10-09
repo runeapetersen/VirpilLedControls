@@ -7,7 +7,11 @@ using SPAD.neXt.Interfaces;
 using SPAD.neXt.Interfaces.Events;
 using SPAD.neXt.Interfaces.HID;
 using SPAD.neXt.Interfaces.Logging;
+using VirpilLedControls.DeviceControl;
 using VirpilLedControls.Interfaces;
+using VirpilLedControls.Model.Commands;
+using VirpilLedControls.Script;
+using VirpilLedControls.SerializationHelpers;
 using Xunit;
 
 namespace VirpilLedControls.Tests
@@ -16,6 +20,7 @@ namespace VirpilLedControls.Tests
     {
         private readonly Mock<IScriptLoggerFactory> _scriptLoggerFactory =
             new Mock<IScriptLoggerFactory>();
+
         private readonly Mock<ILockFactory> _lockFactory = new Mock<ILockFactory>();
         private readonly Mock<IHidDevices> _hidDevices = new Mock<IHidDevices>();
         private readonly Mock<ISmartLock> _smartLock = new Mock<ISmartLock>();
@@ -33,11 +38,14 @@ namespace VirpilLedControls.Tests
             _smartLock
                 .Setup(scriptLock => scriptLock.Lock(It.IsAny<Action>()))
                 .Callback<Action>(action => action());
+            _logger.Setup(logger => logger.CreateChildLogger(It.IsAny<string>()))
+                .Returns(_logger.Object);
 
             _script = new TestableScript(
                 _scriptLoggerFactory.Object,
                 _lockFactory.Object,
-                _hidDevices.Object);
+                _hidDevices.Object,
+                new LedCommandFactory());
             _script.Initialize();
         }
 
@@ -45,10 +53,11 @@ namespace VirpilLedControls.Tests
         public void CallScript_ValidParams_WillSucceed()
         {
             const ushort pid = 0x4259;
-            const string json = "{\"Pid\":\"0x4259\",\"LedId\":1,\"BoardType\":\"SlaveBoard4\",\"Colors\":[{\"R\":\"Full\",\"G\":\"Off\",\"B\":\"Sixty\"}]}";
+            const string json =
+                "{\"Pid\":\"0x4259\",\"LedId\":1,\"BoardType\":\"SlaveBoard4\",\"Colors\":[{\"R\":\"Full\",\"G\":\"Off\",\"B\":\"Sixty\"}]}";
 
             var hidDevice = new Mock<IHidDevice>();
-            var hidCapabilities = new IHidDeviceCapabilities{ FeatureReportByteLength = 1 };
+            var hidCapabilities = new IHidDeviceCapabilities { FeatureReportByteLength = 1 };
             hidDevice.Setup(d => d.ProductId).Returns(pid);
             hidDevice.Setup(d => d.Capabilities).Returns(hidCapabilities);
             _hidDevices.Setup(m => m.Enumerate(It.Is<int>(vid => vid == VirpilDevice.VendorId)))
@@ -56,7 +65,7 @@ namespace VirpilLedControls.Tests
                 {
                     hidDevice.Object
                 });
-           
+
             var parameter = new Mock<IEventActionParameter>();
             parameter.Setup(p => p.ToString()).Returns(json);
 
@@ -65,7 +74,7 @@ namespace VirpilLedControls.Tests
                 new List<IEventActionParameter> { parameter.Object });
 
             var deadline = DateTime.UtcNow.AddSeconds(2);
-            while (!hidDevice.Invocations.Any(i => i.Method.Name == nameof(IHidDevice.WriteFeatureData)) &&
+            while (hidDevice.Invocations.All(i => i.Method.Name != nameof(IHidDevice.WriteFeatureData)) &&
                    DateTime.UtcNow < deadline)
             {
                 Thread.Sleep(20);
@@ -84,8 +93,9 @@ namespace VirpilLedControls.Tests
             public TestableScript(
                 IScriptLoggerFactory scriptLoggerFactory,
                 ILockFactory lockFactory,
-                IHidDevices hidDevices)
-                : base(scriptLoggerFactory, lockFactory, hidDevices)
+                IHidDevices hidDevices,
+                ILedCommandFactory commandFactory)
+                : base(scriptLoggerFactory, lockFactory, hidDevices, commandFactory)
             {
             }
 

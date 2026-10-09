@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace VirpilLedControls
+namespace VirpilLedControls.SerializationHelpers
 {
     public class HexToDecConverter : JsonConverter<uint>
     {
